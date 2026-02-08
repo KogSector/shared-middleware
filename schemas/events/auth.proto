@@ -1,0 +1,31 @@
+syntax = "proto3";
+package confuse.events;
+
+import "events/common.proto";
+
+// Authentication event
+// Topic: auth.events
+message AuthEvent {
+    EventHeaders headers = 1;
+    EventMetadata metadata = 2;
+
+    string user_id = 3;
+    string event_type = 4; // login, logout, token_refresh, login_failed
+    string ip_address = 5;
+    string user_agent = 6;
+    bool success = 7;
+    string failure_reason = 8;
+}
+
+// Session event
+// Topic: session.events
+message SessionEvent {
+    EventHeaders headers = 1;
+    EventMetadata metadata = 2;
+
+    string session_id = 3;
+    string user_id = 4;
+    string event_type = 5; // created, destroyed, expired, refreshed
+    int64 expires_at = 6;  // unix timestamp
+    string device_id = 7;
+}
