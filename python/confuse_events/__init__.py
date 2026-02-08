@@ -7,7 +7,7 @@ This package provides:
 - Configuration utilities for Confluent Cloud environments
 """
 
-from confuse_events.config import KafkaConfig, Environment
+from confuse_events.config import KafkaConfig
 from confuse_events.topics import Topics
 from confuse_events.events import (
     EventHeaders,
@@ -37,7 +37,6 @@ __version__ = "0.1.0"
 __all__ = [
     # Config
     "KafkaConfig",
-    "Environment",
     "Topics",
     # Common types
     "EventHeaders",

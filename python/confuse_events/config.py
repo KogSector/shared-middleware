@@ -14,20 +14,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class Environment(Enum):
-    """Environment mode for the service"""
-    DEVELOPMENT = "development"
-    PRODUCTION = "production"
-    
-    @classmethod
-    def from_env(cls) -> "Environment":
-        """Parse from ENVIRONMENT env var"""
-        env_value = os.getenv("ENVIRONMENT", "development").lower()
-        if env_value in ("production", "prod"):
-            return cls.PRODUCTION
-        return cls.DEVELOPMENT
-
-
 class ConfigError(Exception):
     """Configuration error"""
     pass
@@ -53,7 +39,6 @@ class KafkaConfig:
     sasl_password: Optional[str] = None
     client_id: str = "confuse-service"
     group_id: Optional[str] = None
-    environment: Environment = field(default_factory=Environment.from_env)
     
     @classmethod
     def from_env(cls) -> "KafkaConfig":
@@ -62,8 +47,6 @@ class KafkaConfig:
         
         Always requires CONFLUENT_* variables for Confluent Cloud connectivity.
         """
-        environment = Environment.from_env()
-        
         # Get bootstrap servers (required)
         bootstrap_servers = os.getenv("CONFLUENT_BOOTSTRAP_SERVERS") or os.getenv("KAFKA_BOOTSTRAP_SERVERS")
         
@@ -95,14 +78,12 @@ class KafkaConfig:
             sasl_password=sasl_password,
             client_id=client_id,
             group_id=group_id,
-            environment=environment,
         )
         
         # Log configuration (without secrets)
         logger.info(
             f"Kafka config: bootstrap_servers={config.bootstrap_servers}, "
-            f"security={config.security_protocol}, client_id={config.client_id}, "
-            f"env={config.environment.value}"
+            f"security={config.security_protocol}, client_id={config.client_id}"
         )
         
         return config
