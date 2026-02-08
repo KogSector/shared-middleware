@@ -1,8 +1,8 @@
 """
-Kafka Configuration with CONFLUENT_* Environment Variable Support
+Kafka Configuration for Confluent Cloud
 
-This module provides a unified configuration builder that works with both
-local Kafka (development) and Confluent Cloud (production).
+This module provides configuration for Confluent Cloud connectivity.
+Requires CONFLUENT_* environment variables for authentication.
 """
 
 import os
@@ -36,10 +36,10 @@ class ConfigError(Exception):
 @dataclass
 class KafkaConfig:
     """
-    Kafka configuration builder
+    Kafka configuration for Confluent Cloud
     
-    Uses CONFLUENT_* environment variables for configuration:
-    - CONFLUENT_BOOTSTRAP_SERVERS: Kafka bootstrap servers
+    Requires CONFLUENT_* environment variables for configuration:
+    - CONFLUENT_BOOTSTRAP_SERVERS: Confluent Cloud bootstrap servers
     - CONFLUENT_API_KEY: SASL username (Confluent Cloud API key)
     - CONFLUENT_API_SECRET: SASL password (Confluent Cloud API secret)
     - KAFKA_CLIENT_ID: Client ID for this service
@@ -60,8 +60,7 @@ class KafkaConfig:
         """
         Create a new KafkaConfig from environment variables
         
-        In production mode, this will fail-fast if required CONFLUENT_* vars are missing.
-        In development mode, it will use sensible defaults for local Kafka.
+        Always requires CONFLUENT_* variables for Confluent Cloud connectivity.
         """
         environment = Environment.from_env()
         
@@ -69,27 +68,20 @@ class KafkaConfig:
         bootstrap_servers = os.getenv("CONFLUENT_BOOTSTRAP_SERVERS") or os.getenv("KAFKA_BOOTSTRAP_SERVERS")
         
         if not bootstrap_servers:
-            if environment == Environment.PRODUCTION:
-                raise ConfigError("Missing required environment variable: CONFLUENT_BOOTSTRAP_SERVERS")
-            bootstrap_servers = "localhost:9092"
+            raise ConfigError("Missing required environment variable: CONFLUENT_BOOTSTRAP_SERVERS")
         
-        # Get SASL credentials (required in production)
+        # Get SASL credentials (always required)
         sasl_username = os.getenv("CONFLUENT_API_KEY")
         sasl_password = os.getenv("CONFLUENT_API_SECRET")
         
-        if environment == Environment.PRODUCTION:
-            if not sasl_username:
-                raise ConfigError("Missing required environment variable: CONFLUENT_API_KEY")
-            if not sasl_password:
-                raise ConfigError("Missing required environment variable: CONFLUENT_API_SECRET")
+        if not sasl_username:
+            raise ConfigError("Missing required environment variable: CONFLUENT_API_KEY")
+        if not sasl_password:
+            raise ConfigError("Missing required environment variable: CONFLUENT_API_SECRET")
         
-        # Determine security settings based on environment
-        if environment == Environment.PRODUCTION or sasl_username:
-            security_protocol = "SASL_SSL"
-            sasl_mechanism = "PLAIN"
-        else:
-            security_protocol = "PLAINTEXT"
-            sasl_mechanism = None
+        # Always use Confluent Cloud security settings
+        security_protocol = "SASL_SSL"
+        sasl_mechanism = "PLAIN"
         
         # Get client and group IDs
         client_id = os.getenv("KAFKA_CLIENT_ID", "confuse-service")
@@ -170,6 +162,5 @@ class KafkaConfig:
         if not self.bootstrap_servers:
             raise ConfigError("bootstrap_servers cannot be empty")
         
-        if self.environment == Environment.PRODUCTION:
-            if not self.sasl_username or not self.sasl_password:
-                raise ConfigError("SASL credentials are required in production")
+        if not self.sasl_username or not self.sasl_password:
+            raise ConfigError("SASL credentials are required for Confluent Cloud")

@@ -3,8 +3,8 @@ ConFuse Events - Shared Event Schemas and Kafka Helpers
 
 This package provides:
 - Event schemas matching the Protobuf definitions
-- Kafka producer/consumer helpers with CONFLUENT_* support
-- Configuration utilities for development and production environments
+- Kafka producer/consumer helpers for Confluent Cloud
+- Configuration utilities for Confluent Cloud environments
 """
 
 from confuse_events.config import KafkaConfig, Environment
