@@ -37,6 +37,8 @@ export {
     AuthEvent,
     SessionEvent,
     ProcessingFailedEvent,
+    createEventHeaders,
+    createEventMetadata,
 } from './events';
 
 // Producer/Consumer
