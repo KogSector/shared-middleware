@@ -92,11 +92,8 @@ impl ConnectionPoolManager {
     }
 }
 
-lazy_static::lazy_static! {
-    pub static ref GLOBAL_POOL_MANAGER: ConnectionPoolManager = {
-        ConnectionPoolManager::new(PoolConfig::default())
-    };
-}
+pub static GLOBAL_POOL_MANAGER: once_cell::sync::Lazy<ConnectionPoolManager> =
+    once_cell::sync::Lazy::new(|| ConnectionPoolManager::new(PoolConfig::default()));
 
 pub fn get_pool_manager() -> &'static ConnectionPoolManager {
     &GLOBAL_POOL_MANAGER

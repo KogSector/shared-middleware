@@ -1,93 +1,67 @@
-//! Distributed tracing utilities using OpenTelemetry
+//! Distributed tracing utilities
+//!
+//! Simple tracing setup using tracing-subscriber.
+//! OpenTelemetry integration can be added back when upgrading to
+//! opentelemetry 0.24+ with OTLP exporter.
 
-use opentelemetry::{
-    global,
-    trace::TraceContextExt,
-    Context, KeyValue,
-};
-use opentelemetry_sdk::{
-    trace::{self, RandomIdGenerator, Sampler},
-    Resource,
-};
 use std::collections::HashMap;
 use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt, EnvFilter};
 
-/// Initialize OpenTelemetry tracing with Jaeger exporter
+/// Initialize tracing with env filter and json/fmt layers
 pub fn init_tracing(
     service_name: &str,
-    jaeger_endpoint: &str,
-    sampling_rate: f64,
+    _jaeger_endpoint: &str,
+    _sampling_rate: f64,
 ) -> Result<(), crate::connectivity::error::ConnectivityError> {
-    // Create Jaeger exporter
-    let tracer = opentelemetry_jaeger::new_agent_pipeline()
-        .with_endpoint(jaeger_endpoint)
-        .with_service_name(service_name)
-        .with_trace_config(
-            trace::config()
-                .with_sampler(Sampler::TraceIdRatioBased(sampling_rate))
-                .with_id_generator(RandomIdGenerator::default())
-                .with_resource(Resource::new(vec![
-                    KeyValue::new("service.name", service_name.to_string()),
-                    KeyValue::new("service.version", crate::connectivity::VERSION.to_string()),
-                ])),
-        )
-        .install_batch(opentelemetry_sdk::runtime::Tokio)
-        .map_err(|e| crate::connectivity::error::ConnectivityError::Configuration(e.to_string()))?;
-
-    // Set up tracing subscriber with OpenTelemetry layer
-    let telemetry = tracing_opentelemetry::layer().with_tracer(tracer);
-    
     let env_filter = EnvFilter::try_from_default_env()
         .unwrap_or_else(|_| EnvFilter::new("info"));
 
     tracing_subscriber::registry()
         .with(env_filter)
-        .with(telemetry)
-        .with(tracing_subscriber::fmt::layer())
+        .with(tracing_subscriber::fmt::layer()
+            .with_target(true)
+            .with_thread_ids(true)
+            .with_file(true)
+            .with_line_number(true))
         .try_init()
-        .map_err(|e| crate::connectivity::error::ConnectivityError::Configuration(e.to_string()))?;
+        .map_err(|e| crate::connectivity::error::ConnectivityError::Configuration(
+            format!("Failed to initialize tracing for {}: {}", service_name, e)
+        ))?;
 
+    tracing::info!(service = service_name, "Tracing initialized");
     Ok(())
 }
 
-/// Shutdown tracing and flush remaining spans
+/// Shutdown tracing (no-op without OTel)
 pub fn shutdown_tracing() {
-    global::shutdown_tracer_provider();
+    tracing::info!("Tracing shutdown");
 }
 
-/// Extract trace context from HTTP headers
-pub fn extract_trace_context(headers: &HashMap<String, String>) -> Context {
-    use opentelemetry::propagation::TextMapPropagator;
-    use opentelemetry_sdk::propagation::TraceContextPropagator;
-
-    let propagator = TraceContextPropagator::new();
-    propagator.extract(headers)
+/// Extract trace context from HTTP headers (stub without OTel)
+pub fn extract_trace_context(_headers: &HashMap<String, String>) -> TracingContext {
+    TracingContext::default()
 }
 
-/// Inject trace context into HTTP headers
-pub fn inject_trace_context(context: &Context) -> HashMap<String, String> {
-    use opentelemetry::propagation::TextMapPropagator;
-    use opentelemetry_sdk::propagation::TraceContextPropagator;
+/// Inject trace context into HTTP headers (stub without OTel)
+pub fn inject_trace_context(_context: &TracingContext) -> HashMap<String, String> {
+    HashMap::new()
+}
 
-    let mut headers = HashMap::new();
-    let propagator = TraceContextPropagator::new();
-    propagator.inject_context(context, &mut headers);
-    headers
+/// Simple tracing context placeholder (replaces OTel Context)
+#[derive(Debug, Default, Clone)]
+pub struct TracingContext {
+    pub trace_id: Option<String>,
+    pub span_id: Option<String>,
 }
 
 /// Format trace context as W3C traceparent header
-pub fn format_traceparent(context: &Context) -> String {
-    let span = context.span();
-    let span_context = span.span_context();
-    
-    let flags = if span_context.is_sampled() { 1u8 } else { 0u8 };
-    
-    format!(
-        "00-{}-{}-{:02x}",
-        span_context.trace_id(),
-        span_context.span_id(),
-        flags
-    )
+pub fn format_traceparent(context: &TracingContext) -> String {
+    match (&context.trace_id, &context.span_id) {
+        (Some(trace_id), Some(span_id)) => {
+            format!("00-{}-{}-01", trace_id, span_id)
+        }
+        _ => String::new(),
+    }
 }
 
 /// Parse W3C traceparent header

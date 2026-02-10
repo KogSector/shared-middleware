@@ -34,9 +34,6 @@ pub enum ConnectivityError {
     #[error("Cache error: {0}")]
     Cache(String),
 
-    /// Redis error
-    #[error("Redis error: {0}")]
-    Redis(#[from] redis::RedisError),
 
     /// Event publishing error
     #[error("Event publishing failed: {0}")]
@@ -109,7 +106,6 @@ impl ConnectivityError {
                 | ConnectivityError::NoHealthyInstances(_)
                 | ConnectivityError::DatabaseConnection(_)
                 | ConnectivityError::Cache(_)
-                | ConnectivityError::Redis(_)
         )
     }
 

@@ -25,7 +25,6 @@ tower-http = { version = "0.5", features = ["cors", "trace", "auth", "request-id
 
 # Database
 sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "chrono", "uuid", "json"] }
-redis = { version = "0.24", features = ["tokio-comp"] }
 
 # Kafka (Events)
 rdkafka = { version = "0.36", features = ["cmake-build"] }
@@ -51,10 +50,6 @@ sysinfo = "0.30"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
 tracing-appender = "0.2"
-opentelemetry = "0.22"
-opentelemetry_sdk = { version = "0.22", features = ["rt-tokio"] }
-opentelemetry-jaeger = "0.21"
-tracing-opentelemetry = "0.23"
 log = "0.4"
 
 [features]

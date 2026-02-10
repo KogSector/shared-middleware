@@ -13,5 +13,5 @@ pub use client::{ServiceClient, ServiceClientConfig};
 pub use resilience::{CircuitBreaker, CircuitBreakerConfig, RetryPolicy};
 pub use config::ConnectivityConfig;
 pub use error::{ConnectivityError, Result};
-pub use cache::{RedisCache, MemoryCache};
+pub use cache::MemoryCache;
 pub use database::{ConnectionPoolManager, PoolConfig};

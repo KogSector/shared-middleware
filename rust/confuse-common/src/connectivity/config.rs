@@ -88,8 +88,6 @@ pub struct CircuitBreakerConfig {
 /// Rate limiting configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct RateLimitConfig {
-    /// Redis connection URL
-    pub redis_url: String,
 
     /// Per-user rate limit (requests per minute)
     #[serde(default = "default_per_user_limit")]
@@ -115,8 +113,6 @@ pub struct RateLimitConfig {
 /// Cache configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CacheConfig {
-    /// Redis connection URL
-    pub redis_url: String,
 
     /// Default TTL in seconds
     #[serde(default = "default_cache_ttl")]
@@ -254,7 +250,6 @@ impl Default for ConnectivityConfig {
                 min_calls: default_min_calls(),
             },
             rate_limit: RateLimitConfig {
-                redis_url: "redis://localhost:6379".to_string(),
                 per_user_limit: default_per_user_limit(),
                 per_ip_limit: default_per_ip_limit(),
                 per_service_limit: default_per_service_limit(),
@@ -262,7 +257,6 @@ impl Default for ConnectivityConfig {
                 algorithm: default_rate_limit_algorithm(),
             },
             cache: CacheConfig {
-                redis_url: "redis://localhost:6379".to_string(),
                 default_ttl_secs: default_cache_ttl(),
                 pool_size: default_cache_pool_size(),
                 connection_timeout_secs: default_cache_timeout(),
