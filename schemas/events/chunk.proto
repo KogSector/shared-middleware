@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package events;
+
+import "common.proto";
+
+message ChunkCreatedEvent {
+    EventHeaders headers = 1;
+    EventMetadata metadata = 2;
+    string source_id = 3;
+    string file_id = 4;
+    string chunk_id = 5;
+    string content_hash = 6;
+    string blob_storage_url = 7;
+    string chunk_type = 8;
+    optional uint32 start_line = 9;
+    optional uint32 end_line = 10;
+    optional uint32 page_number = 11;
+    optional string section_heading = 12;
+}

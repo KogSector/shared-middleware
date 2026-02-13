@@ -232,6 +232,38 @@ impl DocsProcessedEvent {
 }
 
 // =============================================================================
+// Chunk Events
+// =============================================================================
+
+/// Event published when a chunk is created and stored
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChunkCreatedEvent {
+    pub headers: EventHeaders,
+    #[serde(default)]
+    pub metadata: EventMetadata,
+    pub source_id: String,
+    pub file_id: String,
+    pub chunk_id: String,
+    pub content_hash: String,
+    pub blob_storage_url: String, // URL to raw content in Blob Storage
+    pub chunk_type: String,       // code, text, table
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_line: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end_line: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub page_number: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub section_heading: Option<String>,
+}
+
+impl ChunkCreatedEvent {
+    pub fn topic() -> &'static str {
+        crate::events::topics::Topics::CHUNKS_CREATED
+    }
+}
+
+// =============================================================================
 // Embedding Events
 // =============================================================================
 

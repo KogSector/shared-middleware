@@ -11,6 +11,7 @@ impl Topics {
     // Document Processing
     pub const DOCS_INGESTED: &'static str = "docs.ingested";
     pub const DOCS_PROCESSED: &'static str = "docs.processed";
+    pub const CHUNKS_CREATED: &'static str = "chunks.created";
     
     // Embeddings
     pub const EMBEDDING_GENERATED: &'static str = "embedding.generated";
