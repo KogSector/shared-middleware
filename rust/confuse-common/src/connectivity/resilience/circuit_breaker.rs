@@ -155,10 +155,11 @@ impl CircuitBreaker {
                 Ok(result)
             }
             Err(e) => {
-                if e.should_trip_circuit_breaker() {
+                let err: ConnectivityError = e;
+                if err.should_trip_circuit_breaker() {
                     self.on_failure();
                 }
-                Err(e)
+                Err(err)
             }
         }
     }

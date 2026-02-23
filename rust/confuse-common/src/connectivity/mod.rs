@@ -6,3 +6,6 @@ pub mod resilience;
 pub mod tracing;
 pub mod cache;
 pub mod falkordb;
+
+// Re-export common types
+pub use error::{ConnectivityError, Result};
