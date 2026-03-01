@@ -17,9 +17,6 @@ pub struct ConnectivityConfig {
     /// Cache configuration
     pub cache: CacheConfig,
 
-    /// Event bus configuration
-    pub events: EventsConfig,
-
     /// Observability configuration
     pub observability: ObservabilityConfig,
 
@@ -131,35 +128,6 @@ pub struct CacheConfig {
     pub enable_invalidation: bool,
 }
 
-/// Events configuration (Kafka)
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct EventsConfig {
-    /// Kafka brokers
-    pub brokers: Vec<String>,
-
-    /// Consumer group ID
-    pub group_id: String,
-
-    /// Enable auto-commit
-    #[serde(default = "default_false")]
-    pub enable_auto_commit: bool,
-
-    /// Session timeout in milliseconds
-    #[serde(default = "default_session_timeout")]
-    pub session_timeout_ms: u64,
-
-    /// Maximum retry attempts
-    #[serde(default = "default_max_retries")]
-    pub max_retries: u32,
-
-    /// Dead letter queue topic
-    #[serde(default = "default_dlq_topic")]
-    pub dlq_topic: String,
-
-    /// Schema registry URL (optional)
-    pub schema_registry_url: Option<String>,
-}
-
 /// Observability configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ObservabilityConfig {
@@ -261,15 +229,6 @@ impl Default for ConnectivityConfig {
                 pool_size: default_cache_pool_size(),
                 connection_timeout_secs: default_cache_timeout(),
                 enable_invalidation: true,
-            },
-            events: EventsConfig {
-                brokers: vec!["localhost:9092".to_string()],
-                group_id: "default-group".to_string(),
-                enable_auto_commit: false,
-                session_timeout_ms: default_session_timeout(),
-                max_retries: default_max_retries(),
-                dlq_topic: default_dlq_topic(),
-                schema_registry_url: None,
             },
             observability: ObservabilityConfig {
                 jaeger_endpoint: "http://localhost:14268/api/traces".to_string(),

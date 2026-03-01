@@ -2,7 +2,7 @@
 
 ## Topics to Create
 
-Create the following 12 topics in Confluent Cloud before production deployment.
+Create the following 11 topics in Confluent Cloud before production deployment.
 
 ### Code Processing Pipeline
 | Topic | Partitions | Retention | Description |
@@ -49,6 +49,7 @@ Create the following 12 topics in Confluent Cloud before production deployment.
 | unified-processor | `code.processed`, `docs.processed`, `graph.build.requested` | `code.ingested`, `docs.ingested` |
 | embeddings-service | `embedding.generated` | `code.processed`, `docs.processed` |
 | relation-graph | `graph.updated`, `graph.build.completed` | `embedding.generated`, `graph.build.requested` |
+| data-vent | - | - (direct FalkorDB queries) |
 | (any service on error) | `dlq.processing.failed` | - |
 
 ## Confluent Cloud CLI Commands
@@ -74,3 +75,4 @@ confluent kafka topic create dlq.processing.failed --partitions 3 --config reten
 1. **Partition Count**: Higher partitions (6) for high-throughput topics (ingestion, processing), lower (3) for control plane topics
 2. **Retention**: 7 days for normal topics, 30 days for DLQ to allow debugging
 3. **Replication**: Confluent Cloud handles replication automatically (typically 3x)
+4. **Architecture Change**: data-connector now communicates with unified-processor via direct gRPC calls instead of Kafka. data-vent queries FalkorDB directly instead of consuming `chunks.stored` notifications.

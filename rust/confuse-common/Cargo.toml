@@ -26,9 +26,6 @@ tower-http = { version = "0.5", features = ["cors", "trace", "auth", "request-id
 # Database
 sqlx = { version = "0.7", features = ["runtime-tokio-rustls", "postgres", "chrono", "uuid", "json"] }
 
-# Kafka (Events)
-rdkafka = { version = "0.36", features = ["cmake-build"] }
-
 # Utils
 uuid = { version = "1.6", features = ["v4", "serde"] }
 chrono = { version = "0.4", features = ["serde"] }

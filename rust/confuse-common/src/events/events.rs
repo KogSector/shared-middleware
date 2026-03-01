@@ -107,7 +107,7 @@ pub struct CodeIngestedEvent {
 
 impl CodeIngestedEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::CODE_INGESTED
+        "code.ingested"
     }
 }
 
@@ -148,7 +148,7 @@ pub struct CodeProcessedEvent {
 
 impl CodeProcessedEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::CODE_PROCESSED
+        "code.processed"
     }
 }
 
@@ -175,7 +175,7 @@ pub struct DocsIngestedEvent {
 
 impl DocsIngestedEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::DOCS_INGESTED
+        "docs.ingested"
     }
 }
 
@@ -227,7 +227,7 @@ pub struct DocsProcessedEvent {
 
 impl DocsProcessedEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::DOCS_PROCESSED
+        "docs.processed"
     }
 }
 
@@ -259,7 +259,7 @@ pub struct ChunkCreatedEvent {
 
 impl ChunkCreatedEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::CHUNKS_CREATED
+        "chunks.created"
     }
 }
 
@@ -286,7 +286,7 @@ pub struct EmbeddingGeneratedEvent {
 
 impl EmbeddingGeneratedEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::EMBEDDING_GENERATED
+        "embedding.generated"
     }
 }
 
@@ -328,7 +328,7 @@ pub struct GraphUpdatedEvent {
 
 impl GraphUpdatedEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::GRAPH_UPDATED
+        "graph.updated"
     }
 }
 
@@ -346,7 +346,7 @@ pub struct GraphBuildRequestedEvent {
 
 impl GraphBuildRequestedEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::GRAPH_BUILD_REQUESTED
+        "graph.build.requested"
     }
 }
 
@@ -365,7 +365,7 @@ pub struct GraphBuildCompletedEvent {
 
 impl GraphBuildCompletedEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::GRAPH_BUILD_COMPLETED
+        "graph.build.completed"
     }
 }
 
@@ -394,7 +394,7 @@ pub struct SourceSyncRequestedEvent {
 
 impl SourceSyncRequestedEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::SOURCE_SYNC_REQUESTED
+        "source.sync.requested"
     }
 
     pub fn new(source_id: impl Into<String>, source_type: SourceType, source_url: impl Into<String>) -> Self {
@@ -438,7 +438,7 @@ pub struct SourceSyncCompletedEvent {
 
 impl SourceSyncCompletedEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::SOURCE_SYNC_COMPLETED
+        "source.sync.completed"
     }
 }
 
@@ -457,7 +457,7 @@ pub struct SourceSyncFailedEvent {
 
 impl SourceSyncFailedEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::SOURCE_SYNC_FAILED
+        "source.sync.failed"
     }
 }
 
@@ -485,7 +485,7 @@ pub struct AuthEvent {
 
 impl AuthEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::AUTH_EVENTS
+        "auth.events"
     }
 }
 
@@ -505,7 +505,7 @@ pub struct SessionEvent {
 
 impl SessionEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::SESSION_EVENTS
+        "session.events"
     }
 }
 
@@ -534,6 +534,6 @@ pub struct ProcessingFailedEvent {
 
 impl ProcessingFailedEvent {
     pub fn topic() -> &'static str {
-        crate::events::topics::Topics::DLQ_PROCESSING_FAILED
+        "dlq.processing.failed"
     }
 }
