@@ -40,3 +40,7 @@ yarn-error.log
 *.so
 *.dylib
 *.dll
+.env
+.env.*
+.env.map
+.env.secret
