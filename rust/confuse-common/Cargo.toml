@@ -48,6 +48,9 @@ redis = { version = "0.24", features = ["tokio-comp"] }
 azure_storage = { version = "0.10", optional = true }
 azure_storage_blobs = { version = "0.10", optional = true }
 
+# Kafka for event streaming
+rdkafka = { version = "0.36", features = ["cmake-build", "ssl"], optional = true }
+
 # Logging/Tracing
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
@@ -58,3 +61,4 @@ log = "0.4"
 default = ["actix", "axum-support"]
 actix = ["dep:actix-web", "dep:actix-web-httpauth"]
 axum-support = ["dep:axum", "dep:tower", "dep:tower-http"]
+kafka = ["dep:rdkafka"]

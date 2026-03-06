@@ -263,6 +263,119 @@ impl ChunkCreatedEvent {
     }
 }
 
+/// Entity hint pre-identified in a chunk by the agentic chunker
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct EntityHint {
+    /// The entity surface form as it appears in the text
+    pub text: String,
+    /// Entity type (organization, person, technology, concept, location, etc.)
+    pub entity_type: String,
+    /// Confidence that this is a real entity (0.0–1.0)
+    pub confidence: f32,
+    /// Byte offset where entity starts in the chunk content
+    pub start_offset: usize,
+    /// Byte offset where entity ends in the chunk content
+    pub end_offset: usize,
+}
+
+/// Simplified chunk metadata for event serialization
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct ChunkMetadata {
+    /// Line range in source file
+    pub line_range: Option<(usize, usize)>,
+    /// Byte range in source file
+    pub byte_range: Option<(usize, usize)>,
+    /// Complexity score (1-10)
+    pub complexity_score: u8,
+    /// Token count (approximate)
+    pub token_count: usize,
+    /// Pre-identified entity hints from agentic chunker
+    #[serde(default)]
+    pub entity_hints: Vec<EntityHint>,
+    /// Relationship hints in "subject -> predicate -> object" notation
+    #[serde(default)]
+    pub relationship_context: Vec<String>,
+    /// Custom key-value metadata
+    #[serde(default)]
+    pub custom: std::collections::HashMap<String, serde_json::Value>,
+}
+
+/// Event published when raw chunks are created with entity hints
+/// Emitted by unified-processor after intelligent chunking; consumed by embeddings-service
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChunkRawEvent {
+    pub headers: EventHeaders,
+    #[serde(default)]
+    pub metadata: EventMetadata,
+    pub source_id: String,
+    pub file_id: String,
+    pub chunk_id: String,
+    /// Raw text content of chunk
+    pub content: String,
+    /// Chunk type (code, text, table, etc.)
+    pub chunk_type: String,
+    /// Granularity level
+    pub level: String,
+    /// Processing tier applied
+    pub tier: String,
+    /// Confidence score (0.0-1.0)
+    pub confidence: f32,
+    /// Quality score (0.0-1.0, populated after enhancement)
+    #[serde(default)]
+    pub quality_score: Option<f32>,
+    /// Chunk metadata
+    pub chunk_metadata: ChunkMetadata,
+    /// Pre-identified entity hints from agentic chunker
+    #[serde(default)]
+    pub entity_hints: Vec<EntityHint>,
+    /// Relationship hints in "subject -> predicate -> object" notation
+    #[serde(default)]
+    pub relationship_context: Vec<String>,
+    /// Creation timestamp
+    #[serde(default = "chrono::Utc::now")]
+    pub created_at: chrono::DateTime<chrono::Utc>,
+}
+
+impl ChunkRawEvent {
+    pub fn topic() -> &'static str {
+        "chunks.raw"
+    }
+}
+
+/// Event published when a chunk has been enriched with entity hints and optional embeddings.
+/// Emitted by unified-processor after agentic enhancement; consumed by relation-graph
+/// to seed entity extraction with pre-identified entities.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ChunkEnrichedEvent {
+    pub headers: EventHeaders,
+    #[serde(default)]
+    pub metadata: EventMetadata,
+    pub source_id: String,
+    pub file_id: String,
+    pub chunk_id: String,
+    /// Actual text content of the chunk (stored directly to avoid blob round-trips)
+    pub content: String,
+    /// Chunk type (code, text, table, etc.)
+    pub chunk_type: String,
+    /// Pre-identified entity hints from the agentic chunker
+    #[serde(default)]
+    pub entity_hints: Vec<EntityHint>,
+    /// Relationship hints in "subject -> predicate -> object" notation
+    #[serde(default)]
+    pub relationship_context: Vec<String>,
+    /// Embedding vector (serialized; None if not yet generated)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub embedding: Option<Vec<f32>>,
+    /// Quality score from the agentic chunker (0.0–1.0)
+    pub quality_score: f32,
+}
+
+impl ChunkEnrichedEvent {
+    pub fn topic() -> &'static str {
+        "chunks.enriched"
+    }
+}
+
 // =============================================================================
 // Embedding Events
 // =============================================================================
