@@ -187,8 +187,11 @@ fn default_rate_limit_algorithm() -> String { "sliding_window".to_string() }
 fn default_cache_ttl() -> u64 { 300 }
 fn default_cache_pool_size() -> u32 { 10 }
 fn default_cache_timeout() -> u64 { 5 }
+#[allow(dead_code)]
 fn default_session_timeout() -> u64 { 30000 }
+#[allow(dead_code)]
 fn default_max_retries() -> u32 { 3 }
+#[allow(dead_code)]
 fn default_dlq_topic() -> String { "dead-letter-queue".to_string() }
 fn default_sampling_rate() -> f64 { 0.1 }
 fn default_metrics_port() -> u16 { 9090 }

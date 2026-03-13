@@ -21,6 +21,7 @@ use uuid::Uuid;
 
 #[derive(Clone)]
 struct Auth0Config {
+    #[allow(dead_code)]
     domain: String,
     issuer: String,
     audience: String,
@@ -116,7 +117,7 @@ struct RawAuth0Claims {
     email: Option<String>,
     scope: Option<String>,
     permissions: Option<Vec<String>>, 
-    #[serde(flatten)]
+    #[allow(dead_code)]
     extra: std::collections::HashMap<String, JsonValue>,
 }
 

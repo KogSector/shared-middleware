@@ -402,31 +402,31 @@ pub struct PongResult {
 pub trait McpContextProvider: Send + Sync {
     fn provider_id(&self) -> String;
     fn supported_context_types(&self) -> Vec<ContextType>;
-    async fn create_context(
+    fn create_context(
         &self,
         context_type: ContextType,
         resource_ids: Vec<ResourceId>,
         metadata: Option<HashMap<String, serde_json::Value>>,
-    ) -> Result<McpContext, McpError>;
-    async fn get_context(&self, context_id: &ContextId) -> Result<McpContext, McpError>;
-    async fn list_resources(&self) -> Result<Vec<McpResource>, McpError>;
-    async fn read_resource(&self, resource_id: &ResourceId) -> Result<ResourceContent, McpError>;
+    ) -> impl std::future::Future<Output = Result<McpContext, McpError>> + Send;
+    fn get_context(&self, context_id: &ContextId) -> impl std::future::Future<Output = Result<McpContext, McpError>> + Send;
+    fn list_resources(&self) -> impl std::future::Future<Output = Result<Vec<McpResource>, McpError>> + Send;
+    fn read_resource(&self, resource_id: &ResourceId) -> impl std::future::Future<Output = Result<ResourceContent, McpError>> + Send;
 }
 
 pub trait McpToolProvider: Send + Sync {
     fn provider_id(&self) -> String;
-    async fn list_tools(&self) -> Result<Vec<McpTool>, McpError>;
-    async fn call_tool(
+    fn list_tools(&self) -> impl std::future::Future<Output = Result<Vec<McpTool>, McpError>> + Send;
+    fn call_tool(
         &self,
         tool_name: &str,
         arguments: Option<serde_json::Value>,
-    ) -> Result<ToolsCallResult, McpError>;
+    ) -> impl std::future::Future<Output = Result<ToolsCallResult, McpError>> + Send;
 }
 
 pub trait McpServerTrait: Send + Sync {
     fn server_info(&self) -> ServerInfo;
     fn capabilities(&self) -> ServerCapabilities;
-    async fn handle_request(&self, request: McpRequest) -> McpResponse;
+    fn handle_request(&self, request: McpRequest) -> impl std::future::Future<Output = McpResponse> + Send;
 }
 
 pub mod error_codes {

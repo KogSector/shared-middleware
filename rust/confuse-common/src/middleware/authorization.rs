@@ -1,8 +1,7 @@
-use actix_web::{dev::ServiceRequest, Error, HttpMessage, HttpResponse};
+use actix_web::{dev::ServiceRequest, Error, HttpMessage};
 use actix_web_httpauth::extractors::bearer::{BearerAuth, Config};
 use actix_web_httpauth::extractors::AuthenticationError;
 use jsonwebtoken::{decode, DecodingKey, Validation, Algorithm};
-use uuid::Uuid;
 use std::collections::HashSet;
 
 // Updated import to crate::models

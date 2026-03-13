@@ -6,7 +6,7 @@ use actix_web::{
             ACCESS_CONTROL_ALLOW_METHODS, ACCESS_CONTROL_ALLOW_ORIGIN,
             ACCESS_CONTROL_EXPOSE_HEADERS, ACCESS_CONTROL_MAX_AGE, ORIGIN,
         },
-        Method, StatusCode,
+        Method,
     },
     Error, HttpResponse, Result,
     body::EitherBody,
@@ -204,7 +204,7 @@ impl CorsMiddleware {
         )
     }
 
-    fn build_cors_response(&self, req: &ServiceRequest, origin: Option<&str>) -> HttpResponse {
+    fn build_cors_response(&self, _req: &ServiceRequest, origin: Option<&str>) -> HttpResponse {
         let mut response = HttpResponse::Ok();
 
         // Set Access-Control-Allow-Origin

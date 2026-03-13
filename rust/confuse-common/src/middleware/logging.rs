@@ -180,6 +180,7 @@ impl LoggingMiddleware {
 
     // fn truncate_body(&self, body: &str) -> String { ... } // Original commented out/unused in provided snippet? Re-include if needed.
 
+    #[allow(dead_code)]
     fn get_user_id(&self, req: &ServiceRequest) -> Option<String> {
         // Try to extract user ID from JWT claims or session
         req.extensions().get::<String>().cloned()
@@ -271,6 +272,7 @@ impl LoggingMiddleware {
         }
     }
 
+    #[allow(dead_code)]
     fn log_performance<B>(&self, req: &ServiceRequest, res: &ServiceResponse<B>, request_id: &str, duration: std::time::Duration) {
          if !self.config.log_performance {
             return;
@@ -301,7 +303,7 @@ impl LoggingMiddleware {
         }
     }
 
-    fn log_performance_with_info<B>(&self, method: &Method, path: &str, headers: &HeaderMap, res: &ServiceResponse<B>, request_id: &str, duration: std::time::Duration) {
+    fn log_performance_with_info<B>(&self, method: &Method, path: &str, _headers: &HeaderMap, res: &ServiceResponse<B>, request_id: &str, duration: std::time::Duration) {
         if !self.config.log_performance {
             return;
         }
@@ -370,7 +372,7 @@ where
 
     forward_ready!(service);
 
-    fn call(&self, mut req: ServiceRequest) -> Self::Future {
+    fn call(&self, req: ServiceRequest) -> Self::Future {
         let middleware = self.middleware.clone();
         let service = self.service.clone();
 

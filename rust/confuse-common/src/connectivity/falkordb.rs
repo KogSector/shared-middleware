@@ -1,6 +1,4 @@
-use redis::{Client, Connection, AsyncCommands, RedisResult, FromRedisValue};
-use std::sync::Arc;
-use tokio::sync::Mutex;
+use redis::{Client, Connection, RedisResult};
 
 #[derive(Clone)]
 pub struct FalkorClient {

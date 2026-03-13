@@ -12,7 +12,6 @@ use axum::{
     Json,
 };
 use serde::{Deserialize, Serialize};
-use std::sync::Arc;
 use tracing;
 
 /// Authenticated user extracted from JWT/API key

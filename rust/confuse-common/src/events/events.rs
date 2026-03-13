@@ -1,6 +1,6 @@
 //! Event Definitions for ConFuse Platform
 
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

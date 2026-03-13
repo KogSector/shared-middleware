@@ -36,6 +36,7 @@ impl Default for PoolConfig {
 
 struct PoolEntry<T> {
     pool: T,
+    #[allow(dead_code)]
     created_at: Instant,
     last_used: Arc<RwLock<Instant>>,
 }
