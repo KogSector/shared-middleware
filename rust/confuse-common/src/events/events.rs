@@ -791,3 +791,72 @@ impl SimplifiedProcessingFailedEvent {
         "dlq.processing.failed"
     }
 }
+
+// =============================================================================
+// Cross-Repository Relationship Events
+// =============================================================================
+
+/// Dependency detected in a repository (package imports, external libraries)
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RepositoryDependency {
+    /// Name of the dependency (e.g., "numpy", "express", "sqlx")
+    pub name: String,
+    /// Version constraint (e.g., "^1.0", ">=2.0.0")
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub version: Option<String>,
+    /// Type of dependency: "runtime", "dev", "build", "peer"
+    pub dependency_type: String,
+    /// Source of detection: "manifest", "import", "api_call"
+    pub detection_source: String,
+    /// File where the dependency was detected
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub detected_in_file: Option<String>,
+}
+
+/// Event carrying repository-level metadata for cross-repo analysis
+/// Emitted by relation-graph after processing a source; consumed by itself for graph building
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct RepositoryMetadataEvent {
+    pub headers: EventHeaders,
+    #[serde(default)]
+    pub metadata: EventMetadata,
+    pub source_id: String,
+    pub repository_name: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub repository_url: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub default_branch: Option<String>,
+    #[serde(default)]
+    pub languages: Vec<String>,
+    #[serde(default)]
+    pub dependencies: Vec<RepositoryDependency>,
+    pub timestamp: String,
+}
+
+impl RepositoryMetadataEvent {
+    pub fn topic() -> &'static str {
+        "repository.metadata"
+    }
+}
+
+/// Event published when cross-repository relationships are detected
+/// Emitted by relation-graph; consumed by monitoring and analytics services
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CrossRepoRelationshipEvent {
+    pub headers: EventHeaders,
+    #[serde(default)]
+    pub metadata: EventMetadata,
+    pub source_repository_id: String,
+    pub target_repository_id: String,
+    pub relationship_type: String,
+    pub confidence: f32,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub evidence_snippet: Option<String>,
+    pub timestamp: String,
+}
+
+impl CrossRepoRelationshipEvent {
+    pub fn topic() -> &'static str {
+        "cross.repo.relationships"
+    }
+}

@@ -25,6 +25,10 @@ impl Topics {
     pub const GRAPH_BUILD_REQUESTED: &'static str = "graph.build.requested";
     pub const GRAPH_BUILD_COMPLETED: &'static str = "graph.build.completed";
     
+    // Cross-Repository Topics
+    pub const CROSS_REPO_RELATIONSHIPS: &'static str = "cross.repo.relationships";
+    pub const REPOSITORY_METADATA: &'static str = "repository.metadata";
+    
     // Source Sync Topics
     pub const SOURCE_SYNC_REQUESTED: &'static str = "source.sync.requested";
     pub const SOURCE_SYNC_COMPLETED: &'static str = "source.sync.completed";
@@ -62,6 +66,10 @@ pub fn get_all_topics() -> Vec<&'static str> {
         Topics::GRAPH_BUILD_REQUESTED,
         Topics::GRAPH_BUILD_COMPLETED,
         
+        // Cross-Repository
+        Topics::CROSS_REPO_RELATIONSHIPS,
+        Topics::REPOSITORY_METADATA,
+        
         // Source Sync
         Topics::SOURCE_SYNC_REQUESTED,
         Topics::SOURCE_SYNC_COMPLETED,
@@ -82,6 +90,8 @@ pub fn get_simplified_flow_topics() -> Vec<&'static str> {
         Topics::CHUNKS_RAW,
         Topics::EMBEDDING_GENERATED,
         Topics::GRAPH_UPDATED,
+        Topics::CROSS_REPO_RELATIONSHIPS,
+        Topics::REPOSITORY_METADATA,
         Topics::DLQ_PROCESSING_FAILED,
     ]
 }
