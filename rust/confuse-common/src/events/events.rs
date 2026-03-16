@@ -650,3 +650,144 @@ impl ProcessingFailedEvent {
         "dlq.processing.failed"
     }
 }
+
+// =============================================================================
+// Simplified Flow Events (unified-processor → embeddings-service → relation-graph)
+// =============================================================================
+
+/// Simplified chunk metadata for raw chunks
+#[derive(Debug, Clone, Serialize, Deserialize, Default)]
+pub struct SimplifiedChunkMetadata {
+    /// Line range in source file
+    pub line_range: Option<(usize, usize)>,
+    /// Byte range in source file
+    pub byte_range: Option<(usize, usize)>,
+    /// Complexity score (1-10)
+    pub complexity_score: u8,
+    /// Token count (approximate)
+    pub token_count: usize,
+    /// Quality score (0.0-1.0)
+    #[serde(default)]
+    pub quality_score: Option<f32>,
+    /// Language for code chunks
+    #[serde(default)]
+    pub language: Option<String>,
+    /// Start line number
+    #[serde(default)]
+    pub start_line: Option<u32>,
+    /// End line number
+    #[serde(default)]
+    pub end_line: Option<u32>,
+    /// Confidence score
+    #[serde(default)]
+    pub confidence: Option<f32>,
+}
+
+/// Simplified chunk structure for raw chunks
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SimplifiedChunk {
+    pub chunk_id: String,
+    pub file_id: String,
+    pub chunk_type: String, // function, class, etc.
+    pub content: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub language: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub start_line: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub end_line: Option<u32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub confidence: Option<f32>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub quality_score: Option<f32>,
+}
+
+/// Event published when raw chunks are created (simplified flow)
+/// Emitted by unified-processor; consumed by embeddings-service
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SimplifiedChunkRawEvent {
+    pub headers: EventHeaders,
+    #[serde(default)]
+    pub metadata: EventMetadata,
+    pub source_id: String,
+    pub chunks: Vec<SimplifiedChunk>,
+    pub timestamp: String,
+}
+
+impl SimplifiedChunkRawEvent {
+    pub fn topic() -> &'static str {
+        "chunks.raw"
+    }
+}
+
+/// Simplified embedding structure
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SimplifiedEmbedding {
+    pub chunk_id: String,
+    pub file_id: String,
+    pub chunk_type: String,
+    pub content: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub language: Option<String>,
+    pub embedding: Vec<f32>,
+    pub model: String,
+    pub dimension: u32,
+}
+
+/// Event published when embeddings are generated (simplified flow)
+/// Emitted by embeddings-service; consumed by relation-graph
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SimplifiedEmbeddingGeneratedEvent {
+    pub headers: EventHeaders,
+    #[serde(default)]
+    pub metadata: EventMetadata,
+    pub source_id: String,
+    pub chunks: Vec<SimplifiedEmbedding>,
+    pub model: String,
+    pub timestamp: String,
+}
+
+impl SimplifiedEmbeddingGeneratedEvent {
+    pub fn topic() -> &'static str {
+        "embedding.generated"
+    }
+}
+
+/// Event published when graph is updated (simplified flow)
+/// Emitted by relation-graph; consumed by monitoring services
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SimplifiedGraphUpdatedEvent {
+    pub headers: EventHeaders,
+    #[serde(default)]
+    pub metadata: EventMetadata,
+    pub source_id: String,
+    pub nodes_created: u32,
+    pub edges_created: u32,
+    pub timestamp: String,
+}
+
+impl SimplifiedGraphUpdatedEvent {
+    pub fn topic() -> &'static str {
+        "graph.updated"
+    }
+}
+
+/// Event published when processing fails (simplified flow)
+/// Emitted by any service; consumed by DLQ handlers
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SimplifiedProcessingFailedEvent {
+    pub headers: EventHeaders,
+    #[serde(default)]
+    pub metadata: EventMetadata,
+    pub original_topic: String,
+    pub original_event_id: String,
+    pub error_message: String,
+    pub error_type: String,
+    pub timestamp: String,
+}
+
+impl SimplifiedProcessingFailedEvent {
+    pub fn topic() -> &'static str {
+        "dlq.processing.failed"
+    }
+}
