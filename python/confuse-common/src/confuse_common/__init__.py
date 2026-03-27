@@ -1,15 +1,17 @@
 """
-ConFuse Events - Shared Event Schemas and Kafka Helpers
+ConFuse Common - Shared Python Library
 
 This package provides:
 - Event schemas matching the Protobuf definitions
 - Kafka producer/consumer helpers for Confluent Cloud
-- Configuration utilities for Confluent Cloud environments
+- Authentication, rate limiting, and security middleware
+- Configuration utilities for ConFuse services
 """
 
-from confuse_events.config import KafkaConfig
-from confuse_events.topics import Topics
-from confuse_events.events import (
+# Events module
+from .events import (
+    KafkaConfig,
+    Topics,
     EventHeaders,
     EventMetadata,
     FileType,
@@ -28,30 +30,45 @@ from confuse_events.events import (
     SourceSyncCompletedEvent,
     SourceSyncFailedEvent,
     ProcessingFailedEvent,
+    EventProducer,
+    EventConsumer,
+    EventHandler,
 )
-from confuse_events.producer import EventProducer
-from confuse_events.consumer import EventConsumer, EventHandler
 
-__version__ = "0.1.0"
+# Middleware module
+from .middleware import (
+    AuthMiddleware,
+    AuthenticatedUser,
+    get_current_user,
+    get_optional_user,
+    RateLimitMiddleware,
+    SecurityHeadersMiddleware,
+)
+
+# Config module
+from .config import (
+    BaseConFuseApp,
+    BaseServiceApp,
+    BaseConFuseSettings,
+    get_settings,
+)
+
+__version__ = "0.2.0"
 
 __all__ = [
-    # Config
+    # Events
     "KafkaConfig",
     "Topics",
-    # Common types
     "EventHeaders",
     "EventMetadata",
     "FileType",
     "SourceType",
-    # Code events
     "CodeIngestedEvent",
     "CodeProcessedEvent",
     "CodeChunk",
-    # Document events
     "DocsIngestedEvent",
     "DocsProcessedEvent",
     "DocChunk",
-    # Other events
     "EmbeddingGeneratedEvent",
     "GraphUpdatedEvent",
     "GraphBuildRequestedEvent",
@@ -60,8 +77,19 @@ __all__ = [
     "SourceSyncCompletedEvent",
     "SourceSyncFailedEvent",
     "ProcessingFailedEvent",
-    # Producer/Consumer
     "EventProducer",
     "EventConsumer",
     "EventHandler",
+    # Middleware
+    "AuthMiddleware",
+    "AuthenticatedUser",
+    "get_current_user",
+    "get_optional_user",
+    "RateLimitMiddleware",
+    "SecurityHeadersMiddleware",
+    # Config
+    "BaseConFuseApp",
+    "BaseServiceApp",
+    "BaseConFuseSettings",
+    "get_settings",
 ]

@@ -10,7 +10,7 @@ from threading import Event
 from pydantic import BaseModel
 from confluent_kafka import Consumer, KafkaError, KafkaException
 
-from confuse_events.config import KafkaConfig, ConfigError
+from .config import KafkaConfig, ConfigError
 
 logger = logging.getLogger(__name__)
 

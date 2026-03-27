@@ -1,15 +1,17 @@
 """
-ConFuse Shared Middleware - Python Package
+ConFuse Common Middleware Module
+
 Authentication, rate limiting, and security headers for FastAPI services.
 """
-from confuse_middleware.auth import (
+
+from .auth import (
     AuthMiddleware,
     AuthenticatedUser,
     get_current_user,
     get_optional_user,
 )
-from confuse_middleware.rate_limit import RateLimitMiddleware
-from confuse_middleware.security_headers import SecurityHeadersMiddleware
+from .rate_limit import RateLimitMiddleware
+from .security_headers import SecurityHeadersMiddleware
 
 __all__ = [
     "AuthMiddleware",

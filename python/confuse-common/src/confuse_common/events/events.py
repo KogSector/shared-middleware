@@ -11,7 +11,7 @@ from typing import Optional, List
 from pydantic import BaseModel, Field
 import uuid
 
-from confuse_events.topics import Topics
+from .topics import Topics
 
 
 # =============================================================================

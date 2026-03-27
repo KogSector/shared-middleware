@@ -9,7 +9,7 @@ from typing import Optional, Any
 from pydantic import BaseModel
 from confluent_kafka import Producer
 
-from confuse_events.config import KafkaConfig, ConfigError
+from .config import KafkaConfig, ConfigError
 
 logger = logging.getLogger(__name__)
 
