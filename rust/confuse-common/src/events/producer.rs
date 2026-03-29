@@ -1,28 +1,5 @@
 //! Event Producer for ConFuse Platform
 
-/// Kafka topic name constants — always available regardless of kafka feature.
-pub struct Topics;
-
-impl Topics {
-    pub const CHUNKS_RAW: &'static str = "chunks.raw";
-    pub const CODE_INGESTED: &'static str = "code.ingested";
-    pub const CODE_PROCESSED: &'static str = "code.processed";
-    pub const DOCS_INGESTED: &'static str = "docs.ingested";
-    pub const DOCS_PROCESSED: &'static str = "docs.processed";
-    pub const CHUNKS_CREATED: &'static str = "chunks.created";
-    pub const CHUNKS_ENRICHED: &'static str = "chunks.enriched";
-    pub const CHUNKS_EMBEDDED: &'static str = "chunks.embedded";
-    pub const EMBEDDING_GENERATED: &'static str = "embedding.generated";
-    pub const GRAPH_UPDATED: &'static str = "graph.updated";
-    pub const GRAPH_BUILD_REQUESTED: &'static str = "graph.build.requested";
-    pub const GRAPH_BUILD_COMPLETED: &'static str = "graph.build.completed";
-    pub const SOURCE_SYNC_REQUESTED: &'static str = "source.sync.requested";
-    pub const SOURCE_SYNC_COMPLETED: &'static str = "source.sync.completed";
-    pub const SOURCE_SYNC_FAILED: &'static str = "source.sync.failed";
-    pub const AUTH_EVENTS: &'static str = "auth.events";
-    pub const SESSION_EVENTS: &'static str = "session.events";
-    pub const DLQ_PROCESSING_FAILED: &'static str = "dlq.processing.failed";
-}
 
 // EventProducer requires the kafka feature (rdkafka → librdkafka → OpenSSL).
 // Gate the entire implementation so services that don't need Kafka can compile
