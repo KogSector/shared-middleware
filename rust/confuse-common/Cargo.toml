@@ -42,7 +42,7 @@ dashmap = "5.5"
 parking_lot = "0.12"
 reqwest = { version = "0.11", features = ["json"] }
 sysinfo = "0.30"
-redis = { version = "0.24", features = ["tokio-comp"] }
+neo4rs = "0.8"
 
 # Cloud Storage
 azure_storage = { version = "0.10", optional = true }
