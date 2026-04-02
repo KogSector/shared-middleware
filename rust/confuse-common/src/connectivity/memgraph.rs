@@ -57,8 +57,8 @@ impl MemgraphClient {
     }
 
     /// Execute a read Cypher query and return a row-stream.
-    pub async fn query(&self, query: Query) -> Result<neo4rs::RowStream, neo4rs::Error> {
-        self.graph.execute(query).await
+    pub async fn query(&self, query: Query) -> Result<impl futures::stream::TryStream<Ok = neo4rs::Row, Error = neo4rs::Error>, neo4rs::Error> {
+        self.graph.execute(query).await.map(|s| s.into_stream())
     }
 
     /// Convenience: execute a raw Cypher string with no parameters.
@@ -67,8 +67,8 @@ impl MemgraphClient {
     }
 
     /// Convenience: query a raw Cypher string with no parameters.
-    pub async fn query_raw(&self, cypher: &str) -> Result<neo4rs::RowStream, neo4rs::Error> {
-        self.graph.execute(neo4rs::query(cypher)).await
+    pub async fn query_raw(&self, cypher: &str) -> Result<impl futures::stream::TryStream<Ok = neo4rs::Row, Error = neo4rs::Error>, neo4rs::Error> {
+        self.graph.execute(neo4rs::query(cypher)).await.map(|s| s.into_stream())
     }
 
     /// Expose the underlying `neo4rs::Graph` handle for advanced use.
