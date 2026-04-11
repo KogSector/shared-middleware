@@ -5,8 +5,8 @@ pub mod error;
 pub mod resilience;
 pub mod tracing;
 pub mod cache;
-pub mod memgraph;
+pub mod falkordb;
 
 // Re-export common types
 pub use error::{ConnectivityError, Result};
-pub use memgraph::MemgraphClient;
+pub use falkordb::FalkorClient;
