@@ -1,6 +1,6 @@
 //! FalkorDB client — Redis-protocol connectivity for ConFuse platform.
 //!
-//! Replaces the former Memgraph/Bolt-based graph client.
+//! Replaces the former Bolt-based graph client.
 //! FalkorDB speaks the standard Redis wire protocol, so we connect
 //! with the `redis` and `bb8-redis` crates.
 
