@@ -38,6 +38,8 @@ class SourceType(str, Enum):
     FILE_UPLOAD = "file_upload"
     DROPBOX = "dropbox"
     ONEDRIVE = "onedrive"
+    WEB = "web"
+    URL = "url"
 
 
 class EventHeaders(BaseModel):

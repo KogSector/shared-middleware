@@ -70,16 +70,32 @@ pub enum FileType {
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum SourceType {
+    #[serde(rename = "unknown")]
     Unknown,
+    #[serde(rename = "github")]
     Github,
+    #[serde(rename = "gitlab")]
     Gitlab,
+    #[serde(rename = "bitbucket")]
     Bitbucket,
+    #[serde(rename = "local")]
     Local,
-    GoogleDrive,
+    #[serde(rename = "gdrive")]
+    Gdrive,
+    #[serde(rename = "notion")]
     Notion,
+    #[serde(rename = "file_upload")]
     FileUpload,
+    #[serde(rename = "dropbox")]
     Dropbox,
+    #[serde(rename = "onedrive")]
     Onedrive,
+    #[serde(rename = "web")]
+    Web,
+    #[serde(rename = "url")]
+    Url,
+    #[serde(rename = "s3")]
+    S3,
 }
 
 // =============================================================================
