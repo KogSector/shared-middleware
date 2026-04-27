@@ -19,6 +19,8 @@ dependencies = [
     "passlib[bcrypt]>=1.7.4",
     "structlog>=24.1.0",
     "python-dotenv>=1.0.0",
+    "grpcio>=1.60.0",
+    "grpcio-health-checking>=1.60.0",
 ]
 
 [project.optional-dependencies]

@@ -8,10 +8,13 @@ import os
 from dataclasses import dataclass, field
 from typing import Optional
 
+import grpc
 import httpx
 import structlog
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+
+from confuse_common.proto import auth_v1_pb2, auth_v1_pb2_grpc
 
 logger = structlog.get_logger()
 security = HTTPBearer(auto_error=False)
@@ -57,19 +60,60 @@ class AuthMiddleware:
     def __init__(
         self,
         auth_service_url: Optional[str] = None,
+        auth_grpc_url: Optional[str] = None,
         auth_bypass_enabled: Optional[bool] = None,
     ):
         self.auth_service_url = auth_service_url or os.getenv(
             "AUTH_MIDDLEWARE_URL", "http://auth-middleware:3010"
         )
+        self.auth_grpc_url = auth_grpc_url or os.getenv(
+            "AUTH_GRPC_URL", "localhost:50058"
+        )
+        
         if auth_bypass_enabled is not None:
             self.auth_bypass_enabled = auth_bypass_enabled
         else:
             self.auth_bypass_enabled = os.getenv("AUTH_BYPASS_ENABLED", "false").lower() == "true"
+            
         self._client = httpx.AsyncClient(timeout=5.0)
+        
+        # Initialize gRPC channel lazily or here? 
+        # For simplicity in this common middleware, we'll initialize it here
+        # but in a production scenario, we might want a persistent channel pool.
+        try:
+            self._grpc_channel = grpc.aio.insecure_channel(self.auth_grpc_url)
+            self._grpc_stub = auth_v1_pb2_grpc.AuthStub(self._grpc_channel)
+        except Exception as e:
+            logger.warning("Failed to initialize auth gRPC channel", error=str(e))
+            self._grpc_stub = None
 
     async def _verify_token(self, token: str) -> AuthenticatedUser:
-        """Validate a JWT token via auth-middleware."""
+        """Validate a JWT token via auth-middleware (prefers gRPC)."""
+        # Try gRPC first
+        if self._grpc_stub:
+            try:
+                request = auth_v1_pb2.ValidateTokenRequest(token=token)
+                response = await self._grpc_stub.ValidateToken(request, timeout=2.0)
+                
+                if response.valid:
+                    return AuthenticatedUser(
+                        id=response.user_id,
+                        email="",  # gRPC returns minimal info
+                        roles=list(response.roles),
+                    )
+                else:
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail=response.error or "Invalid token",
+                    )
+            except grpc.RpcError as e:
+                logger.warning("Auth gRPC call failed, falling back to HTTP", error=str(e))
+            except HTTPException:
+                raise
+            except Exception as e:
+                logger.error("Unexpected gRPC error", error=str(e))
+
+        # Fallback to HTTP
         try:
             resp = await self._client.post(
                 f"{self.auth_service_url}/auth/validate",
@@ -97,7 +141,32 @@ class AuthMiddleware:
             )
 
     async def _verify_api_key(self, key: str) -> AuthenticatedUser:
-        """Validate an API key via auth-middleware."""
+        """Validate an API key via auth-middleware (prefers gRPC)."""
+        # Try gRPC first
+        if self._grpc_stub:
+            try:
+                request = auth_v1_pb2.ValidateApiKeyRequest(api_key=key)
+                response = await self._grpc_stub.ValidateApiKey(request, timeout=2.0)
+                
+                if response.valid:
+                    return AuthenticatedUser(
+                        id=response.user_id,
+                        email=response.email,
+                        roles=list(response.roles),
+                    )
+                else:
+                    raise HTTPException(
+                        status_code=status.HTTP_401_UNAUTHORIZED,
+                        detail=response.error or "Invalid API key",
+                    )
+            except grpc.RpcError as e:
+                logger.warning("Auth gRPC call failed for API key, falling back to HTTP", error=str(e))
+            except HTTPException:
+                raise
+            except Exception as e:
+                logger.error("Unexpected gRPC error during API key validation", error=str(e))
+
+        # Fallback to HTTP
         try:
             resp = await self._client.post(
                 f"{self.auth_service_url}/auth/validate-api-key",
@@ -122,6 +191,51 @@ class AuthMiddleware:
                 status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
                 detail="Authentication service unavailable",
             )
+
+    async def get_internal_token(self, api_key: str, user_id: str, provider: str) -> dict:
+        """
+        Get auth token for a provider (internal call, prefers gRPC).
+        """
+        # Try gRPC first
+        if self._grpc_stub:
+            try:
+                request = auth_v1_pb2.GetInternalTokenRequest(
+                    api_key=api_key,
+                    user_id=user_id,
+                    provider=provider
+                )
+                response = await self._grpc_stub.GetInternalToken(request, timeout=3.0)
+                
+                if response.success:
+                    return {
+                        "success": True,
+                        "provider": response.provider,
+                        "access_token": response.access_token,
+                        "refresh_token": response.refresh_token,
+                        "token_type": response.token_type
+                    }
+                else:
+                    logger.warning("Auth gRPC GetInternalToken failed", error=response.error)
+            except grpc.RpcError as e:
+                logger.warning("Auth gRPC GetInternalToken call failed, falling back to HTTP", error=str(e))
+            except Exception as e:
+                logger.error("Unexpected gRPC error during token retrieval", error=str(e))
+
+        # Fallback to HTTP
+        try:
+            resp = await self._client.post(
+                f"{self.auth_service_url}/api/auth/internal/tokens",
+                json={"userId": user_id, "provider": provider},
+                headers={"X-Api-Key": api_key}
+            )
+            if resp.status_code == 200:
+                return resp.json()
+            else:
+                logger.error("Auth service returned error for token retrieval", status=resp.status_code, body=resp.text)
+                return {"success": False, "error": f"Status {resp.status_code}"}
+        except Exception as e:
+            logger.error("Auth service unreachable for token retrieval", error=str(e))
+            return {"success": False, "error": str(e)}
 
     async def required(
         self,

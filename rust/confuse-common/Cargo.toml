@@ -53,6 +53,11 @@ azure_storage_blobs = { version = "0.10", optional = true }
 # ssl-vendored: bundles OpenSSL at compile time — no system OpenSSL needed on Windows or Docker
 rdkafka = { version = "0.36", features = ["cmake-build", "ssl-vendored"], optional = true }
 
+# gRPC
+tonic = { version = "0.11", features = ["transport", "codegen", "prost"] }
+prost = "0.12"
+prost-types = "0.12"
+
 # Logging/Tracing
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
@@ -64,3 +69,4 @@ default = ["actix", "axum-support"]
 actix = ["dep:actix-web", "dep:actix-web-httpauth"]
 axum-support = ["dep:axum", "dep:tower", "dep:tower-http"]
 kafka = ["dep:rdkafka"]
+grpc-auth = ["tonic/transport"]
