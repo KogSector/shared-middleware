@@ -80,7 +80,7 @@ export class KafkaConfig {
                     'Missing required environment variable: CONFLUENT_BOOTSTRAP_SERVERS'
                 );
             }
-            bootstrapServers = 'localhost:9092';
+            bootstrapServers = '127.0.0.1:9092';
         }
 
         // Get SASL credentials (required in production)

@@ -53,18 +53,19 @@ class KafkaConfig:
         if not bootstrap_servers:
             raise ConfigError("Missing required environment variable: CONFLUENT_BOOTSTRAP_SERVERS")
         
-        # Get SASL credentials (always required)
-        sasl_username = os.getenv("CONFLUENT_API_KEY")
-        sasl_password = os.getenv("CONFLUENT_API_SECRET")
+        # Get security settings
+        security_protocol = os.getenv("KAFKA_SECURITY_PROTOCOL", "SASL_SSL")
+        sasl_mechanism = os.getenv("KAFKA_SASL_MECHANISM", "PLAIN")
         
-        if not sasl_username:
-            raise ConfigError("Missing required environment variable: CONFLUENT_API_KEY")
-        if not sasl_password:
-            raise ConfigError("Missing required environment variable: CONFLUENT_API_SECRET")
+        # SASL credentials (required if not PLAINTEXT)
+        sasl_username = os.getenv("CONFLUENT_API_KEY") or os.getenv("KAFKA_SASL_USERNAME")
+        sasl_password = os.getenv("CONFLUENT_API_SECRET") or os.getenv("KAFKA_SASL_PASSWORD")
         
-        # Always use Confluent Cloud security settings
-        security_protocol = "SASL_SSL"
-        sasl_mechanism = "PLAIN"
+        if security_protocol != "PLAINTEXT":
+            if not sasl_username:
+                raise ConfigError("Missing required environment variable: CONFLUENT_API_KEY or KAFKA_SASL_USERNAME")
+            if not sasl_password:
+                raise ConfigError("Missing required environment variable: CONFLUENT_API_SECRET or KAFKA_SASL_PASSWORD")
         
         # Get client and group IDs
         client_id = os.getenv("KAFKA_CLIENT_ID", "confuse-service")
@@ -143,5 +144,5 @@ class KafkaConfig:
         if not self.bootstrap_servers:
             raise ConfigError("bootstrap_servers cannot be empty")
         
-        if not self.sasl_username or not self.sasl_password:
-            raise ConfigError("SASL credentials are required for Confluent Cloud")
+        if self.security_protocol != "PLAINTEXT" and (not self.sasl_username or not self.sasl_password):
+            raise ConfigError("SASL credentials are required for authenticated Kafka")
