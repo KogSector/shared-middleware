@@ -1,6 +1,7 @@
 //! ConFuse Events - Shared Event Schemas
 
 pub mod events;
+pub mod episode;
 pub mod topics;
 
 #[cfg(feature = "kafka")]

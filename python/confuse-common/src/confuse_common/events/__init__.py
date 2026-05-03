@@ -26,6 +26,13 @@ from .events import (
     SourceSyncFailedEvent,
     ProcessingFailedEvent,
 )
+from .episode import (
+    GraphifyEpisode,
+    EpisodeSourceType,
+    EpisodeChunkType,
+    EpisodeMetadata,
+    EpisodeProvenance,
+)
 from .producer import EventProducer
 from .consumer import EventConsumer, EventHandler
 
@@ -57,6 +64,12 @@ __all__ = [
     "SourceSyncCompletedEvent",
     "SourceSyncFailedEvent",
     "ProcessingFailedEvent",
+    # Graphify episodes
+    "GraphifyEpisode",
+    "EpisodeSourceType",
+    "EpisodeChunkType",
+    "EpisodeMetadata",
+    "EpisodeProvenance",
     # Producer/Consumer
     "EventProducer",
     "EventConsumer",

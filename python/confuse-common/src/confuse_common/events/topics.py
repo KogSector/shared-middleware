@@ -85,6 +85,18 @@ class Topics:
     SOURCE_SYNC_FAILED = "source.sync.failed"
     
     # =========================================================================
+    # Graphify Episode Pipeline
+    # =========================================================================
+    
+    # Topic for Graphify episode ingestion
+    # Producer: data-connector, unified-processor, embeddings-service
+    # Consumer: Graphify knowledge graph
+    GRAPHIFY_EPISODES = "graphify.episodes.v1"
+    
+    # Dead-letter queue for failed Graphify episode processing
+    GRAPHIFY_EPISODES_DLQ = "graphify.episodes.dlq"
+    
+    # =========================================================================
     # Dead Letter Queue
     # =========================================================================
     
@@ -108,5 +120,15 @@ class Topics:
             cls.SOURCE_SYNC_REQUESTED,
             cls.SOURCE_SYNC_COMPLETED,
             cls.SOURCE_SYNC_FAILED,
+            cls.GRAPHIFY_EPISODES,
+            cls.GRAPHIFY_EPISODES_DLQ,
             cls.DLQ_PROCESSING_FAILED,
+        ]
+
+    @classmethod
+    def graphify(cls) -> list[str]:
+        """Get Graphify-specific topics."""
+        return [
+            cls.GRAPHIFY_EPISODES,
+            cls.GRAPHIFY_EPISODES_DLQ,
         ]

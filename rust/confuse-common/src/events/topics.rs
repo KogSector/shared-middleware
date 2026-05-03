@@ -38,6 +38,10 @@ impl Topics {
     pub const AUTH_EVENTS: &'static str = "auth.events";
     pub const SESSION_EVENTS: &'static str = "session.events";
     
+    // Graphify Episode Topics
+    pub const GRAPHIFY_EPISODES: &'static str = "graphify.episodes.v1";
+    pub const GRAPHIFY_EPISODES_DLQ: &'static str = "graphify.episodes.dlq";
+
     // DLQ Topics
     pub const DLQ_PROCESSING_FAILED: &'static str = "dlq.processing.failed";
 }
@@ -79,6 +83,10 @@ pub fn get_all_topics() -> Vec<&'static str> {
         Topics::AUTH_EVENTS,
         Topics::SESSION_EVENTS,
         
+        // Graphify
+        Topics::GRAPHIFY_EPISODES,
+        Topics::GRAPHIFY_EPISODES_DLQ,
+        
         // DLQ
         Topics::DLQ_PROCESSING_FAILED,
     ]
@@ -92,6 +100,15 @@ pub fn get_simplified_flow_topics() -> Vec<&'static str> {
         Topics::GRAPH_UPDATED,
         Topics::CROSS_REPO_RELATIONSHIPS,
         Topics::REPOSITORY_METADATA,
+        Topics::GRAPHIFY_EPISODES,
         Topics::DLQ_PROCESSING_FAILED,
+    ]
+}
+
+/// Get Graphify-specific topics
+pub fn get_graphify_topics() -> Vec<&'static str> {
+    vec![
+        Topics::GRAPHIFY_EPISODES,
+        Topics::GRAPHIFY_EPISODES_DLQ,
     ]
 }
