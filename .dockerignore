@@ -1,0 +1,39 @@
+# Common ignores for multi-language library repo
+
+# Git
+.git
+.gitignore
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Python
+**/__pycache__/
+**/*.py[cod]
+**/.venv/
+**/venv/
+**/build/
+**/dist/
+**/*.egg-info/
+
+# Node
+node_modules/
+npm-debug.log
+pnpm-lock.yaml
+yarn.lock
+
+# Rust
+/target/
+**/target/
+
+# IDEs
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Large artifacts
+*.tar
+*.zip
