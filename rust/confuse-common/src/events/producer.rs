@@ -26,7 +26,6 @@ mod kafka_impl {
 
             Ok(Self { producer })
         }
-
         pub async fn publish<T: Serialize>(&self, topic: &str, event: &T) -> Result<()> {
             let payload = serde_json::to_string(event)?;
             let record = FutureRecord::to(topic)
@@ -43,6 +42,50 @@ mod kafka_impl {
                     Err(anyhow::anyhow!("Failed to send event: {}", e))
                 }
             }
+        }
+
+        /// Publish with retries and optional DLQ fallback.
+        pub async fn publish_with_retry<T: Serialize + std::fmt::Debug>(
+            &self,
+            topic: &str,
+            event: &T,
+            retries: usize,
+            dlq_topic: Option<&str>,
+        ) -> Result<()> {
+            use tokio::time::{sleep, Duration};
+
+            let mut last_err: Option<anyhow::Error> = None;
+
+            for attempt in 0..retries {
+                match self.publish(topic, event).await {
+                    Ok(_) => return Ok(()),
+                    Err(e) => {
+                        tracing::warn!("Publish attempt {} failed for topic {}: {}", attempt + 1, topic, e);
+                        last_err = Some(e);
+                        let delay = Duration::from_millis((2u64.pow(attempt as u32)) * 500);
+                        sleep(delay).await;
+                    }
+                }
+            }
+
+            tracing::error!("Failed to publish after {} attempts", retries);
+
+            if let Some(dlq) = dlq_topic {
+                // Build failure envelope
+                let envelope = serde_json::json!({
+                    "failedTopic": topic,
+                    "failedAt": chrono::Utc::now().timestamp_millis(),
+                    "error": format!("{:?}", last_err),
+                    "event": format!("{:?}", event),
+                });
+                if let Err(e) = self.publish(dlq, &envelope).await {
+                    tracing::error!("Failed to publish failure envelope to DLQ {}: {}", dlq, e);
+                } else {
+                    tracing::info!("Published failure envelope to DLQ {}", dlq);
+                }
+            }
+
+            Err(last_err.unwrap_or_else(|| anyhow::anyhow!("publish failed without error")))
         }
     }
 }

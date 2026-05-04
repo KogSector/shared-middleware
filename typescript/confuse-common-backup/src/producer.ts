@@ -67,6 +67,58 @@ export class EventProducer {
     }
 
     /**
+     * Publish with retries and optional DLQ fallback.
+     * - `retries` attempts (default 3) with exponential backoff (500ms base).
+     * - If all attempts fail, publishes a failure envelope to `dlqTopic` if provided.
+     */
+    async publishWithRetry<T extends object>(
+        event: T,
+        topic: string,
+        key?: string,
+        retries = 3,
+        dlqTopic?: string
+    ): Promise<void> {
+        let lastErr: unknown = null;
+
+        for (let attempt = 0; attempt < retries; attempt++) {
+            try {
+                if (key) {
+                    await this.publishWithKey(event, topic, key);
+                } else {
+                    await this.publish(event, topic);
+                }
+                return;
+            } catch (err) {
+                lastErr = err;
+                const delay = Math.pow(2, attempt) * 500; // 500ms, 1s, 2s, ...
+                // eslint-disable-next-line no-await-in-loop
+                await new Promise(resolve => setTimeout(resolve, delay));
+            }
+        }
+
+        console.error(`Failed to publish event to ${topic} after ${retries} attempts`, lastErr);
+
+        // Publish failure envelope to DLQ if configured
+        const finalDlq = dlqTopic || process.env.KAFKA_DLQ_TOPIC || `${topic}.dlq`;
+        if (finalDlq) {
+            try {
+                const envelope = {
+                    failedTopic: topic,
+                    failedAt: Date.now(),
+                    error: String(lastErr),
+                    event,
+                };
+                await this.publish(envelope, finalDlq);
+                console.log(`Published failure envelope to DLQ ${finalDlq}`);
+            } catch (dlqErr) {
+                console.error('Failed to publish to DLQ', dlqErr);
+            }
+        }
+
+        throw lastErr;
+    }
+
+    /**
      * Publish an event with a custom key
      */
     async publishWithKey<T extends object>(

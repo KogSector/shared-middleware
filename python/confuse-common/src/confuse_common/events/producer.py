@@ -85,6 +85,56 @@ class EventProducer:
         
         # Trigger delivery reports
         self.producer.poll(0)
+
+    def publish_with_retry_to_topic(
+        self,
+        event: BaseModel,
+        topic: str,
+        key: Optional[str] = None,
+        retries: int = 3,
+        dlq_topic: Optional[str] = None,
+    ) -> None:
+        """
+        Publish an event with retries and optional DLQ fallback.
+        Retries use exponential backoff starting at 0.5s.
+        """
+        last_err: Optional[Exception] = None
+
+        for attempt in range(retries):
+            try:
+                self.publish_to_topic(event, topic, key=key)
+                # Give producer a chance to process delivery report
+                self.producer.poll(0)
+                return
+            except Exception as e:
+                last_err = e
+                delay = (2 ** attempt) * 0.5
+                logger.warning(f"Publish attempt {attempt+1} failed for {topic}, retrying in {delay}s: {e}")
+                import time
+                time.sleep(delay)
+
+        logger.error(f"Failed to publish event to {topic} after {retries} attempts: {last_err}")
+
+        final_dlq = dlq_topic or (f"{topic}.dlq" if topic else None)
+        if final_dlq:
+            try:
+                envelope = {
+                    "failedTopic": topic,
+                    "failedAt": int(__import__('time').time() * 1000),
+                    "error": str(last_err),
+                    "event": event.model_dump(),
+                }
+                # Use publish_raw to send JSON envelope
+                import json
+                self.publish_raw(final_dlq, json.dumps(envelope), key=key)
+                self.producer.poll(0)
+                logger.info(f"Published failure envelope to DLQ {final_dlq}")
+            except Exception as dlq_err:
+                logger.exception("Failed to publish to DLQ", exc_info=dlq_err)
+
+        # Raise original error for caller handling
+        if last_err:
+            raise ProducerError(str(last_err))
     
     def publish_raw(
         self,
