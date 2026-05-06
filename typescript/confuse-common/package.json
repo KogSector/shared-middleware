@@ -1,6 +1,7 @@
 {
   "name": "@confuse/common",
   "version": "0.2.0",
+  "type": "module",
   "description": "Shared common library for ConFuse platform with events, middleware, and configuration utilities",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

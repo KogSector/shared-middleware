@@ -5,7 +5,7 @@
  */
 
 import { v4 as uuidv4 } from 'uuid';
-import { Topics } from './topics';
+import { Topics } from './topics.js';
 
 // =============================================================================
 // Common Types

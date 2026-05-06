@@ -5,7 +5,7 @@
  */
 
 import { Kafka, Producer, ProducerRecord } from 'kafkajs';
-import { KafkaConfig } from './config';
+import { KafkaConfig } from './config.js';
 
 export class EventProducer {
     private config: KafkaConfig;

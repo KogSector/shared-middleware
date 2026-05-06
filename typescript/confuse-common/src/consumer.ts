@@ -5,7 +5,7 @@
  */
 
 import { Kafka, Consumer, EachMessagePayload } from 'kafkajs';
-import { KafkaConfig } from './config';
+import { KafkaConfig } from './config.js';
 
 /**
  * Interface for event handlers

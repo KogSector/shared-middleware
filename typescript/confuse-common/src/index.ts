@@ -9,10 +9,10 @@
  */
 
 // Config
-export { KafkaConfig, Environment, ConfigError } from './config';
+export { KafkaConfig, Environment, ConfigError } from './config.js';
 
 // Topics
-export { Topics } from './topics';
+export { Topics } from './topics.js';
 
 // Events
 export {
@@ -40,11 +40,11 @@ export {
     ProcessingFailedEvent,
     createEventHeaders,
     createEventMetadata,
-} from './events';
+} from './events.js';
 
 // Producer/Consumer
-export { EventProducer } from './producer';
-export { EventConsumer, EventHandler } from './consumer';
+export { EventProducer } from './producer.js';
+export { EventConsumer, EventHandler } from './consumer.js';
 
 // Middleware
-export { AuthMiddleware, RateLimitMiddleware, SecurityHeadersMiddleware } from './middleware';
+export { AuthMiddleware, RateLimitMiddleware, SecurityHeadersMiddleware } from './middleware/index.js';
