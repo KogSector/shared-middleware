@@ -736,13 +736,12 @@ impl SimplifiedChunkRawEvent {
     }
 }
 
-/// Simplified embedding structure
+/// Simplified embedding structure (without content - unified-processor already has it)
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SimplifiedEmbedding {
     pub chunk_id: String,
     pub file_id: String,
     pub chunk_type: String,
-    pub content: String,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub language: Option<String>,
     pub embedding: Vec<f32>,
