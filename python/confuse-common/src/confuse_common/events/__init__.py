@@ -25,6 +25,15 @@ from .events import (
     SourceSyncCompletedEvent,
     SourceSyncFailedEvent,
     ProcessingFailedEvent,
+    RepoIngestRequestedEvent,
+    RepoIngestRequestedPayload,
+    RepoUpdatedEvent,
+    RepoUpdatedPayload,
+    RepoIngestFailedEvent,
+    RepoIngestFailedPayload,
+    RepoIngestCompletedEvent,
+    RepoIngestCompletedPayload,
+    RepoIngestStats,
 )
 from .episode import (
     GraphifyEpisode,
@@ -64,6 +73,16 @@ __all__ = [
     "SourceSyncCompletedEvent",
     "SourceSyncFailedEvent",
     "ProcessingFailedEvent",
+    # Event-driven pipeline events
+    "RepoIngestRequestedEvent",
+    "RepoIngestRequestedPayload",
+    "RepoUpdatedEvent",
+    "RepoUpdatedPayload",
+    "RepoIngestFailedEvent",
+    "RepoIngestFailedPayload",
+    "RepoIngestCompletedEvent",
+    "RepoIngestCompletedPayload",
+    "RepoIngestStats",
     # Graphify episodes
     "GraphifyEpisode",
     "EpisodeSourceType",

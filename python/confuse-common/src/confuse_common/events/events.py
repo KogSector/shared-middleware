@@ -377,3 +377,121 @@ class ProcessingFailedEvent(BaseModel):
     @staticmethod
     def topic() -> str:
         return Topics.DLQ_PROCESSING_FAILED
+
+
+# =============================================================================
+# Event-Driven Pipeline Events (Refactored Architecture)
+# =============================================================================
+
+
+class RepoIngestRequestedEvent(BaseModel):
+    """
+    Event published when a repository ingestion is requested
+    Topic: repo-events
+    """
+    event_type: str = "REPO_INGEST_REQUESTED"
+    event_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    correlation_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    payload: "RepoIngestRequestedPayload"
+    
+    @staticmethod
+    def topic() -> str:
+        return Topics.REPO_EVENTS
+
+
+class RepoIngestRequestedPayload(BaseModel):
+    """Payload for REPO_INGEST_REQUESTED event"""
+    repo_id: str
+    url: str
+    branch: str
+    provider: str  # github, gitlab, bitbucket
+    commit_id: str
+    credential_ref: str  # JWT token for credential exchange
+    user_id: str
+    organization_id: Optional[str] = None
+
+
+class RepoUpdatedEvent(BaseModel):
+    """
+    Event published when a repository is updated (webhook)
+    Topic: repo-events
+    """
+    event_type: str = "REPO_UPDATED"
+    event_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    correlation_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    payload: "RepoUpdatedPayload"
+    
+    @staticmethod
+    def topic() -> str:
+        return Topics.REPO_EVENTS
+
+
+class RepoUpdatedPayload(BaseModel):
+    """Payload for REPO_UPDATED event"""
+    repo_id: str
+    url: str
+    branch: str
+    provider: str
+    old_commit: str
+    new_commit: str
+    credential_ref: str
+    update_type: str  # push, force_push, branch_update
+
+
+class RepoIngestFailedEvent(BaseModel):
+    """
+    Event published when repository ingestion fails
+    Topic: repo-events
+    """
+    event_type: str = "REPO_INGEST_FAILED"
+    event_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    correlation_id: str
+    payload: "RepoIngestFailedPayload"
+    
+    @staticmethod
+    def topic() -> str:
+        return Topics.REPO_EVENTS
+
+
+class RepoIngestFailedPayload(BaseModel):
+    """Payload for REPO_INGEST_FAILED event"""
+    repo_id: str
+    error_code: str  # CLONE_FAILED, AUTH_FAILED, INVALID_REPO, PROCESSING_FAILED, TIMEOUT
+    error_message: str
+    retry_count: int = 0
+    fatal: bool = False
+
+
+class RepoIngestCompletedEvent(BaseModel):
+    """
+    Event published when repository ingestion completes successfully
+    Topic: repo-events
+    """
+    event_type: str = "REPO_INGEST_COMPLETED"
+    event_id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    timestamp: str = Field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    correlation_id: str
+    payload: "RepoIngestCompletedPayload"
+    
+    @staticmethod
+    def topic() -> str:
+        return Topics.REPO_EVENTS
+
+
+class RepoIngestCompletedPayload(BaseModel):
+    """Payload for REPO_INGEST_COMPLETED event"""
+    repo_id: str
+    commit_id: str
+    stats: "RepoIngestStats"
+
+
+class RepoIngestStats(BaseModel):
+    """Statistics for repository ingestion"""
+    files_processed: int
+    chunks_created: int
+    processing_duration_ms: int
+    repository_size_bytes: int
+

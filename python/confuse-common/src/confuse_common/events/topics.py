@@ -85,6 +85,30 @@ class Topics:
     SOURCE_SYNC_FAILED = "source.sync.failed"
     
     # =========================================================================
+    # Event-Driven Pipeline (Refactored Architecture)
+    # =========================================================================
+    
+    # Topic for repository ingestion and update events
+    # Producer: data-connector
+    # Consumer: unified-processor
+    REPO_EVENTS = "repo-events"
+    
+    # Topic for code chunk events
+    # Producer: unified-processor
+    # Consumer: embeddings-service
+    CODE_CHUNKS = "code-chunks"
+    
+    # Topic for embedding events
+    # Producer: embeddings-service
+    # Consumer: storage services
+    EMBEDDING_EVENTS = "embedding-events"
+    
+    # Dead letter queues for event-driven pipeline
+    REPO_EVENTS_DLQ = "repo-events-dlq"
+    CODE_CHUNKS_DLQ = "code-chunks-dlq"
+    EMBEDDING_EVENTS_DLQ = "embedding-events-dlq"
+    
+    # =========================================================================
     # Graphify Episode Pipeline
     # =========================================================================
     
@@ -123,6 +147,12 @@ class Topics:
             cls.GRAPHIFY_EPISODES,
             cls.GRAPHIFY_EPISODES_DLQ,
             cls.DLQ_PROCESSING_FAILED,
+            cls.REPO_EVENTS,
+            cls.CODE_CHUNKS,
+            cls.EMBEDDING_EVENTS,
+            cls.REPO_EVENTS_DLQ,
+            cls.CODE_CHUNKS_DLQ,
+            cls.EMBEDDING_EVENTS_DLQ,
         ]
 
     @classmethod
