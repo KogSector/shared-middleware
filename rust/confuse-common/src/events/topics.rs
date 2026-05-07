@@ -12,6 +12,9 @@ impl Topics {
 
     // Embedding Topics (embeddings-service → unified-processor)
     pub const EMBEDDING_GENERATED: &'static str = "embedding.generated";
+
+    // Graphify Topics (embeddings-service → relation-graph)
+    pub const GRAPHIFY_EPISODES: &'static str = "graphify.episodes";
 }
 
 /// Get all active topic names for configuration
