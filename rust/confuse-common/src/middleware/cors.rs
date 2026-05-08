@@ -40,7 +40,6 @@ impl Default for CorsConfig {
                 "http://localhost:3000".to_string(),
                 "http://localhost:3001".to_string(),
                 "http://localhost:8080".to_string(),
-                "https://conhub.dev".to_string(),
             ],
             allowed_methods: vec![
                 "GET".to_string(),
@@ -87,7 +86,7 @@ impl CorsConfig {
 
     pub fn strict() -> Self {
         Self {
-            allowed_origins: vec!["https://conhub.dev".to_string()],
+            allowed_origins: vec!["https://confuse.dev".to_string()],
             allowed_methods: vec!["GET".to_string(), "POST".to_string()],
             allowed_headers: vec![
                 "Content-Type".to_string(),

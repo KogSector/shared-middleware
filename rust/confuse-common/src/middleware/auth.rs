@@ -174,8 +174,8 @@ where
                             if auth_str.starts_with("Bearer ") {
                                 let token = &auth_str[7..];
                                 
-                                // Try ConHub token first (issued by auth service after Auth0 exchange)
-                                if let Ok(claims) = verify_conhub_jwt_token(token).await {
+                                // Try ConFuse token first (issued by auth service after Auth0 exchange)
+                                if let Ok(claims) = verify_confuse_jwt_token(token).await {
                                     req.extensions_mut().insert(claims);
                                     let res = service.call(req).await?;
                                     return Ok(res.map_into_left_body());
@@ -354,38 +354,38 @@ async fn verify_auth0_jwt_token(
     Ok(internal_claims)
 }
 
-async fn verify_conhub_jwt_token(token: &str) -> Result<crate::models::auth::Claims, Box<dyn std::error::Error>> { // CORRECTION
+async fn verify_confuse_jwt_token(token: &str) -> Result<crate::models::auth::Claims, Box<dyn std::error::Error>> { // CORRECTION
     let header = decode_header(token)?;
     
     let kid = header.kid.as_deref().unwrap_or("");
-    if kid != "conhub-auth-key" {
-        return Err("Not a ConHub token".into());
+    if kid != "confuse-auth-key" {
+            return Err("Not a ConFuse token".into());
     }
     
-    let public_key_raw = std::env::var("CONHUB_AUTH_PUBLIC_KEY")
+    let public_key_raw = std::env::var("CONFUSE_AUTH_PUBLIC_KEY")
         .or_else(|_| std::env::var("JWT_PUBLIC_KEY"))
-        .map_err(|_| "ConHub auth public key not configured")?;
+        .map_err(|_| "ConFuse auth public key not configured")?;
     
     let public_key_pem = public_key_raw
         .trim_matches('"')
         .replace("\\n", "\n");
     
     let decoding_key = DecodingKey::from_rsa_pem(public_key_pem.as_bytes())
-        .map_err(|e| format!("Failed to parse ConHub public key: {}", e))?;
+        .map_err(|e| format!("Failed to parse ConFuse public key: {}", e))?;
     
     let mut validation = Validation::new(Algorithm::RS256);
-    validation.set_issuer(&["conhub-auth"]);
-    validation.set_audience(&["conhub-services"]);
+    validation.set_issuer(&["confuse-auth"]);
+    validation.set_audience(&["confuse-services"]);
     
     let token_data = decode::<crate::models::auth::Claims>(token, &decoding_key, &validation) // CORRECTION
-        .map_err(|e| format!("ConHub token validation failed: {}", e))?;
+        .map_err(|e| format!("ConFuse token validation failed: {}", e))?;
     
     let now = chrono::Utc::now().timestamp() as usize;
     if token_data.claims.exp < now {
-        return Err("ConHub token expired".into());
+        return Err("ConFuse token expired".into());
     }
     
-    tracing::debug!("Successfully verified ConHub token for sub: {}", token_data.claims.sub);
+    tracing::debug!("Successfully verified ConFuse token for sub: {}", token_data.claims.sub);
     Ok(token_data.claims)
 }
 

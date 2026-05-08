@@ -264,9 +264,9 @@ pub struct Claims {
 // Default development user helpers used when Auth is disabled
 // These values are not stored in any database; they are generated at runtime
 // and can be used to populate user-related fields in a dev environment.
-pub const DEFAULT_DEV_EMAIL: &str = "dev@conhub.local";
+pub const DEFAULT_DEV_EMAIL: &str = "dev@confuse.local";
 pub const DEFAULT_DEV_NAME: &str = "Development User";
-pub const DEFAULT_DEV_ORG: &str = "ConHub Dev";
+pub const DEFAULT_DEV_ORG: &str = "ConFuse Dev";
 
 // Deterministic dev user ID to keep consistency across services and restarts
 pub fn default_dev_user_id() -> uuid::Uuid {
@@ -307,8 +307,8 @@ pub fn default_dev_claims() -> Claims {
         roles: vec!["user".to_string(), "dev".to_string()],
         exp,
         iat: now,
-        iss: "conhub".to_string(),
-        aud: "conhub-users".to_string(),
+        iss: "confuse".to_string(),
+        aud: "confuse-users".to_string(),
         session_id,
         jti,
     }
