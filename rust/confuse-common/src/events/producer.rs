@@ -18,10 +18,15 @@ mod kafka_impl {
 
     impl EventProducer {
         pub fn new(bootstrap_servers: &str) -> Result<Self> {
+            let enable_idempotence = std::env::var("KAFKA_ENABLE_IDEMPOTENCE")
+                .unwrap_or_else(|_| "true".to_string())
+                .to_lowercase() == "true";
+
             let producer: FutureProducer = ClientConfig::new()
                 .set("bootstrap.servers", bootstrap_servers)
                 .set("message.max.bytes", "1000000")
                 .set("delivery.timeout.ms", "5000")
+                .set("enable.idempotence", enable_idempotence.to_string())
                 .create()?;
 
             Ok(Self { producer })

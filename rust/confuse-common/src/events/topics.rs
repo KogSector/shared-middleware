@@ -13,8 +13,8 @@ impl Topics {
     // Embedding Topics (embeddings-service → unified-processor)
     pub const EMBEDDING_GENERATED: &'static str = "embedding.generated";
 
-    // Graphify Topics (embeddings-service → relation-graph)
-    pub const GRAPHIFY_EPISODES: &'static str = "graphify.episodes";
+    // Graphify Topics (data-connector → graphify-pipeline)
+    pub const GRAPHIFY_EPISODES: &'static str = "graphify.episodes.v1";
 }
 
 /// Get all active topic names for configuration
@@ -23,5 +23,6 @@ pub fn get_all_topics() -> Vec<&'static str> {
         Topics::SOURCE_SYNC_REQUESTED,
         Topics::CHUNKS_RAW,
         Topics::EMBEDDING_GENERATED,
+        Topics::GRAPHIFY_EPISODES,
     ]
 }

@@ -24,6 +24,10 @@ class Topics:
     # Consumer: unified-processor
     EMBEDDING_GENERATED = "embedding.generated"
 
+    # Graphify Episodes (data-connector → graphify-pipeline)
+    # Producer: data-connector
+    GRAPHIFY_EPISODES = "graphify.episodes.v1"
+
     @classmethod
     def all(cls) -> list[str]:
         """Get all active topics for Confluent Cloud provisioning"""
@@ -31,4 +35,5 @@ class Topics:
             cls.SOURCE_SYNC_REQUESTED,
             cls.CHUNKS_RAW,
             cls.EMBEDDING_GENERATED,
+            cls.GRAPHIFY_EPISODES,
         ]

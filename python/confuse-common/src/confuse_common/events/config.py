@@ -39,6 +39,7 @@ class KafkaConfig:
     sasl_password: Optional[str] = None
     client_id: str = "confuse-service"
     group_id: Optional[str] = None
+    enable_idempotence: bool = True
     
     @classmethod
     def from_env(cls) -> "KafkaConfig":
@@ -79,6 +80,7 @@ class KafkaConfig:
             sasl_password=sasl_password,
             client_id=client_id,
             group_id=group_id,
+            enable_idempotence=os.getenv("KAFKA_ENABLE_IDEMPOTENCE", "true").lower() == "true",
         )
         
         # Log configuration (without secrets)
@@ -99,7 +101,7 @@ class KafkaConfig:
             "retries": 5,
             "retry.backoff.ms": 100,
             "request.timeout.ms": 30000,
-            "enable.idempotence": True,
+            "enable.idempotence": self.enable_idempotence,
         }
         
         if self.sasl_mechanism:
