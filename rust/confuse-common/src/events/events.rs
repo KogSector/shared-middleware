@@ -96,6 +96,20 @@ pub enum SourceType {
     Url,
     #[serde(rename = "s3")]
     S3,
+    #[serde(rename = "salesforce")]
+    Salesforce,
+    #[serde(rename = "hubspot")]
+    Hubspot,
+    #[serde(rename = "drata")]
+    Drata,
+    #[serde(rename = "vanta")]
+    Vanta,
+    #[serde(rename = "confluence")]
+    Confluence,
+    #[serde(rename = "sql_database")]
+    SqlDatabase,
+    #[serde(rename = "nosql_database")]
+    NosqlDatabase,
 }
 
 // =============================================================================
